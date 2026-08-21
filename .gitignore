@@ -5,3 +5,5 @@
    build/
    .vercel
 /generated/prisma
+
+.vercel
