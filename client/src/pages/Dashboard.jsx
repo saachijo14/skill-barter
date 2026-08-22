@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Repeat, Package, Clock, TrendingUp, MapPin, Plus, Radar } from 'lucide-react';
 import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -11,6 +13,8 @@ export default function Dashboard() {
   const [transactions, setTransactions] = useState([]);
   const [nearby, setNearby] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [userCoords, setUserCoords] = useState(null);
 
   useEffect(() => {
     async function loadData() {
@@ -24,10 +28,11 @@ export default function Dashboard() {
 
         // Try to load nearby listings if we have geolocation permission
         navigator.geolocation.getCurrentPosition(async (pos) => {
-          const res = await api.get('/listings/search', {
-            params: { lat: pos.coords.latitude, lng: pos.coords.longitude, radius: 16000 },
-          });
-          setNearby(res.data.slice(0, 3));
+        setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        const res = await api.get('/listings/search', {
+        params: { lat: pos.coords.latitude, lng: pos.coords.longitude, radius: 16000 },
+        });
+        setNearby(res.data.slice(0, 3));
         });
       } catch (err) {
         console.error(err);
@@ -68,20 +73,34 @@ const handleInitiate = async (item) => {
             <Link to="/dashboard" className="text-cyan-400">Dashboard</Link>
             <Link to="/explore" className="text-slate-400 hover:text-white transition">Browse Skills</Link>
             <Link to="/transactions" className="text-slate-400 hover:text-white transition">My Swaps</Link>
-            <span className="text-slate-600">Community Wallet</span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="bg-purple-500/20 text-purple-300 text-sm px-3 py-1.5 rounded-full">
-              {user.timeBalance} Credits
-            </span>
-            <button
-              onClick={logout}
-              className="w-8 h-8 rounded-full bg-slate-700 text-white text-xs flex items-center justify-center hover:bg-slate-600 transition"
-              title="Log out"
-            >
-              {user.name?.[0]?.toUpperCase()}
-            </button>
-          </div>
+          <div className="flex items-center gap-3 relative">
+  <span className="bg-purple-500/20 text-purple-300 text-sm px-3 py-1.5 rounded-full">
+    {user.timeBalance} Credits
+  </span>
+  <div className="relative">
+    <button
+      onClick={() => setMenuOpen(!menuOpen)}
+      className="w-8 h-8 rounded-full bg-slate-700 text-white text-xs flex items-center justify-center hover:bg-slate-600 transition"
+    >
+      {user.name?.[0]?.toUpperCase()}
+    </button>
+    {menuOpen && (
+      <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl overflow-hidden z-20">
+        <div className="px-4 py-3 border-b border-slate-700">
+          <p className="text-white text-sm font-medium">{user.name}</p>
+          <p className="text-slate-400 text-xs">{user.email}</p>
+        </div>
+        <button
+          onClick={logout}
+          className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700 transition"
+        >
+          Log out
+        </button>
+        </div>
+        )}
+    </div>
+    </div>
         </div>
       </nav>
 
@@ -144,15 +163,24 @@ const handleInitiate = async (item) => {
             ))}
           </div>
 
-          {/* Community radar sidebar */}
           <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
             <h3 className="text-white font-medium mb-1 flex items-center gap-2">
               <MapPin className="w-4 h-4 text-cyan-400" /> Community Radar
             </h3>
             <p className="text-slate-500 text-xs mb-4">Members matching your requests nearby.</p>
-            <div className="bg-slate-950 rounded-lg h-40 flex items-center justify-center border border-slate-800 mb-3">
-              <span className="text-slate-600 text-xs">Radar preview</span>
-            </div>
+            <div className="rounded-lg h-40 overflow-hidden border border-slate-800 mb-3">
+            {userCoords ? (
+            <MapContainer center={[userCoords.lat, userCoords.lng]} zoom={11} zoomControl={false} dragging={false} style={{ height: '100%', width: '100%' }}>
+            <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" attribution="" />
+            <Marker position={[userCoords.lat, userCoords.lng]} />
+            {nearby.map((item) => (
+            <Marker key={item.id} position={[item.lat, item.lng]} />
+            ))}
+            </MapContainer>
+            ) : (
+            <div className="h-full flex items-center justify-center text-slate-600 text-xs">Enable location to see the radar</div>
+            )}
+          </div>
             <div className="flex justify-between text-xs text-slate-400">
               <span>Swappers Online</span>
               <span className="text-white">{nearby.length} Local</span>
