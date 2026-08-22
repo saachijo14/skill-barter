@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from 'react';
+import api from '../lib/api';
 
 const AuthContext = createContext(null);
 
@@ -20,8 +21,19 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const refreshUser = async () => {
+    try {
+      const res = await api.get('/profile/me');
+      const updated = { ...user, timeBalance: res.data.timeBalance };
+      localStorage.setItem('user', JSON.stringify(updated));
+      setUser(updated);
+    } catch (err) {
+      console.error('Could not refresh user', err);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

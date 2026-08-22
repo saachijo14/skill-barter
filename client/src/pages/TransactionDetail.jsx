@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function TransactionDetail() {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState(null);
   const [rating, setRating] = useState(0);
@@ -36,14 +36,23 @@ export default function TransactionDetail() {
   };
 
   const handleConfirm = async () => {
-    try {
-      await api.post(`/transactions/${id}/confirm`);
-      loadData();
-    } catch (err) {
-      setError(err.response?.data?.error || 'Could not confirm');
-    }
-  };
+  try {
+    await api.post(`/transactions/${id}/confirm`);
+    await refreshUser();
+    loadData();
+  } catch (err) {
+    setError(err.response?.data?.error || 'Could not confirm');
+  }
+};
 
+const handleComplete = async () => {
+  try {
+    await api.post(`/transactions/${id}/complete`);
+    loadData();
+  } catch (err) {
+    setError(err.response?.data?.error || 'Could not complete');
+  }
+};
   const handleReview = async () => {
     try {
       await api.post('/reviews', { transactionId: id, rating, comment });
@@ -138,8 +147,19 @@ export default function TransactionDetail() {
             {transaction.status === 'pending' && !isProvider && (
               <p className="text-slate-400 text-sm">Waiting for the provider to confirm this swap.</p>
             )}
-            {transaction.status !== 'pending' && (
-              <p className="text-emerald-400 text-sm">✓ {transaction.creditsTransferred} time-credits transferred.</p>
+            {transaction.status === 'confirmed' && (
+            <>
+            <p className="text-emerald-400 text-sm">✓ {transaction.creditsTransferred} time-credits transferred.</p>
+            <button
+            onClick={handleComplete}
+            className="w-full bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-lg py-2.5 mt-2 transition"
+            >
+            Mark Swap as Completed
+            </button>
+            </>
+            )}
+            {transaction.status === 'completed' && (
+                <p className="text-emerald-400 text-sm">✓ Swap completed and credits transferred.</p>
             )}
 
             {transaction.status !== 'pending' && (
