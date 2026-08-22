@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Repeat, Search, Plus } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -42,6 +42,20 @@ export default function Explore() {
   const filtered = listings.filter((l) =>
     l.skill_name.toLowerCase().includes(search.toLowerCase())
   );
+
+  const navigate = useNavigate();
+
+const handleInitiate = async (item) => {
+  try {
+    const res = await api.post('/transactions', {
+      listingId: item.id,
+      creditsOffered: item.creditRate,
+    });
+    navigate(`/transactions/${res.data.id}`);
+  } catch (err) {
+    alert(err.response?.data?.error || 'Could not initiate swap');
+  }
+};
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col">
@@ -147,8 +161,11 @@ export default function Explore() {
               <p className="text-slate-400 text-sm mb-2">{item.provider_name}</p>
               <div className="flex items-center justify-between">
                 <span className="text-cyan-400 text-sm">{item.creditRate} hr/credits</span>
-                <button className="text-xs bg-slate-800 text-white px-3 py-1.5 rounded-lg">
-                  View Swap →
+                <button
+                    onClick={() => handleInitiate(item)}
+                    className="text-xs bg-slate-800 text-white px-3 py-1.5 rounded-lg hover:bg-slate-700 transition"
+                    >
+                    Initiate Swap →
                 </button>
               </div>
             </div>

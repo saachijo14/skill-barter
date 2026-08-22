@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Repeat, Package, Clock, TrendingUp, MapPin, Plus, Radar } from 'lucide-react';
 import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
@@ -42,6 +42,16 @@ export default function Dashboard() {
   const earnedCredits = transactions
     .filter((t) => t.providerId === user.id && t.status !== 'pending')
     .reduce((sum, t) => sum + t.creditsTransferred, 0);
+
+    const navigate = useNavigate();
+const handleInitiate = async (item) => {
+  try {
+    const res = await api.post('/transactions', { listingId: item.id, creditsOffered: item.creditRate });
+    navigate(`/transactions/${res.data.id}`);
+  } catch (err) {
+    alert(err.response?.data?.error || 'Could not initiate swap');
+  }
+};
 
   return (
     <div className="min-h-screen bg-slate-950">
@@ -126,9 +136,9 @@ export default function Dashboard() {
                 </div>
                 <div className="text-right">
                   <span className="text-cyan-400 text-sm font-medium block mb-2">{item.creditRate} hr/credits</span>
-                  <Link to={`/explore`} className="text-xs bg-slate-800 text-white px-3 py-1.5 rounded-lg">
+                  <button onClick={() => handleInitiate(item)} className="text-xs bg-slate-800 text-white px-3 py-1.5 rounded-lg">
                     Initiate Swap →
-                  </Link>
+                  </button>
                 </div>
               </motion.div>
             ))}
