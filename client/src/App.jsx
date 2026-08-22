@@ -4,6 +4,8 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ProfileSetup from './pages/ProfileSetup';
 import Dashboard from './pages/Dashboard';
+import CreateListing from './pages/CreateListing';
+import Explore from './pages/Explore';
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -24,6 +26,8 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route path="/create-listing" element={<ProtectedRoute><CreateListing /></ProtectedRoute>} />
+      <Route path="/explore" element={<ProtectedRoute><Explore /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );
