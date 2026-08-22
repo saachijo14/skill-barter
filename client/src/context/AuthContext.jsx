@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
 
   const refreshUser = async () => {
     try {
-      const res = await api.get('/profile/me');
+      const res = await api.get('/profile/location');
       const updated = { ...user, timeBalance: res.data.timeBalance };
       localStorage.setItem('user', JSON.stringify(updated));
       setUser(updated);
