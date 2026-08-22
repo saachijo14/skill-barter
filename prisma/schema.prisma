@@ -37,6 +37,7 @@ model Listing {
   skill       Skill    @relation(fields: [skillId], references: [id])
   type        String
   description String
+  creditRate  Int      @default(1)
   createdAt   DateTime @default(now())
 }
 

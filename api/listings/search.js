@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   const searchRadius = radius ? parseFloat(radius) : 5000; // default 5km
 
   const results = await prisma.$queryRawUnsafe(
-    `SELECT l.id, l.description, l.type, l."createdAt", u.name as provider_name,
+    `SELECT l.id, l.description, l.type, l."creditRate",l."createdAt", u.name as provider_name,
             s.name as skill_name, s.category,
             ST_Distance(loc.geom, ST_MakePoint($1, $2)::geography) as distance_m
      FROM "Listing" l

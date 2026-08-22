@@ -31,6 +31,6 @@ export default async function handler(req, res) {
 
   res.status(200).json({
     token,
-    user: { id: user.id, email: user.email, name: user.name },
+    user: { id: user.id, email: user.email, name: user.name, timeBalance: user.timeBalance },
   });
 }

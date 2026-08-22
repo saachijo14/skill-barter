@@ -10,14 +10,14 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { skillId, type, description, lat, lng } = req.body;
+    const { skillId, type, description, lat, lng, creditRate } = req.body;
 
     if (!skillId || !type || !description || lat === undefined || lng === undefined) {
-      return res.status(400).json({ error: 'skillId, type, description, lat, and lng are required' });
+    return res.status(400).json({ error: 'skillId, type, description, lat, and lng are required' });
     }
 
     const listing = await prisma.listing.create({
-      data: { userId, skillId, type, description },
+    data: { userId, skillId, type, description, creditRate: creditRate || 1 },
     });
 
     await prisma.$executeRawUnsafe(
