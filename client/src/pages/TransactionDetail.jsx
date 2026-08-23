@@ -27,7 +27,8 @@ export default function TransactionDetail() {
     await refreshUser();
     if (found && (found.status === 'confirmed' || found.status === 'completed')) {
       const reviewRes = await api.get('/reviews', { params: { transactionId: id } });
-      setReview(reviewRes.data);
+      const myReview = reviewRes.data.find((r) => r.reviewerId === user.id);
+      setReview(myReview || null);
     }
   } catch (err) {
     setError('Could not load transaction');

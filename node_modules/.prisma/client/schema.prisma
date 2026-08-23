@@ -55,6 +55,7 @@ model Transaction {
 model Review {
   id            String   @id @default(uuid())
   transactionId String
+  reviewerId    String
   rating        Int
   comment       String?
   createdAt     DateTime @default(now())
