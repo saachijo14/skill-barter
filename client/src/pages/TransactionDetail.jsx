@@ -20,20 +20,21 @@ export default function TransactionDetail() {
   }, [id]);
 
   const loadData = async () => {
-    try {
-      const all = await api.get('/transactions/mine');
-      const found = all.data.find((t) => t.id === id);
-      setTransaction(found);
-      if (found && (found.status === 'confirmed' || found.status === 'completed')) {
-        const reviewRes = await api.get('/reviews', { params: { transactionId: id } });
-        setReview(reviewRes.data);
-      }
-    } catch (err) {
-      setError('Could not load transaction');
-    } finally {
-      setLoading(false);
+  try {
+    const all = await api.get('/transactions/mine');
+    const found = all.data.find((t) => t.id === id);
+    setTransaction(found);
+    await refreshUser();
+    if (found && (found.status === 'confirmed' || found.status === 'completed')) {
+      const reviewRes = await api.get('/reviews', { params: { transactionId: id } });
+      setReview(reviewRes.data);
     }
-  };
+  } catch (err) {
+    setError('Could not load transaction');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleConfirm = async () => {
   try {
@@ -119,20 +120,20 @@ const handleComplete = async () => {
             <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">
               {transaction.status === 'pending' ? 'Awaiting Confirmation' : transaction.status === 'confirmed' ? 'Swap In Progress' : 'Completed'}
             </span>
-            <h1 className="text-xl font-bold text-white mt-2 mb-1">Skill Swap #{transaction.id.slice(0, 8)}</h1>
+            <h1 className="text-xl font-bold text-white mt-2 mb-1">{transaction.skillName}</h1>
             <span className="text-cyan-400 text-sm">{transaction.creditsTransferred} credits</span>
 
             <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-slate-800">
               <div>
                 <span className="text-slate-500 text-xs">SKILL PROVIDER</span>
-                <p className="text-white font-medium mt-1">{isProvider ? user.name : 'Provider'}</p>
-              </div>
-              <div>
+                <p className="text-white font-medium mt-1">{transaction.providerName}</p>
+                </div>
+                <div>
                 <span className="text-slate-500 text-xs">SKILL REQUESTER</span>
-                <p className="text-white font-medium mt-1">{!isProvider ? user.name : 'Requester'}</p>
+                <p className="text-white font-medium mt-1">{transaction.requesterName}</p>
               </div>
             </div>
-          </div>
+            </div>
 
           <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 space-y-4">
             <h3 className="text-white font-medium">Swap Action Center</h3>

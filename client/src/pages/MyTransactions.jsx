@@ -46,16 +46,19 @@ export default function MyTransactions() {
                 <div>
                   <span
                     className={`text-xs px-2 py-0.5 rounded-full ${
-                      t.status === 'pending'
-                        ? 'bg-yellow-500/20 text-yellow-300'
-                        : t.status === 'confirmed'
-                        ? 'bg-cyan-500/20 text-cyan-300'
-                        : 'bg-emerald-500/20 text-emerald-300'
+                    t.status === 'pending'
+                    ? 'bg-yellow-500/20 text-yellow-300'
+                    : t.status === 'confirmed'
+                    ? 'bg-cyan-500/20 text-cyan-300'
+                    : 'bg-emerald-500/20 text-emerald-300'
                     }`}
-                  >
+                    >
                     {t.status}
                   </span>
-                  <p className="text-white font-medium mt-1">Swap #{t.id.slice(0, 8)}</p>
+                <p className="text-white font-medium mt-1">{t.skillName}</p>
+                <p className="text-slate-400 text-xs">
+                {t.providerId === user.id ? `Requested by ${t.requesterName}` : `Offered by ${t.providerName}`}
+                </p>
                 </div>
                 <span className="text-cyan-400 text-sm">{t.creditsTransferred} credits</span>
               </div>
