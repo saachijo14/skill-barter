@@ -151,15 +151,21 @@ const handleComplete = async () => {
             )}
             {transaction.status === 'confirmed' && (
             <>
-            <p className="text-emerald-400 text-sm">✓ {transaction.creditsTransferred} time-credits transferred.</p>
-            <button
-            onClick={handleComplete}
-            className="w-full bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-lg py-2.5 mt-2 transition"
-            >
-            Mark Swap as Completed
-            </button>
-            </>
+              <p className="text-emerald-400 text-sm">✓ {transaction.creditsTransferred} time-credits transferred.</p>
+              {isProvider ? (
+              <button
+                onClick={handleComplete}
+                className="w-full bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-lg py-2.5 mt-2 transition"
+              >
+              Mark Swap as Completed
+              </button>
+            ) : (
+            <p className="text-slate-400 text-sm mt-2">
+            Waiting for {transaction.providerName} to mark this swap as completed.
+            </p>
             )}
+          </>
+          )}
             {transaction.status === 'completed' && (
                 <p className="text-emerald-400 text-sm">✓ Swap completed and credits transferred.</p>
             )}

@@ -19,13 +19,13 @@ export default async function handler(req, res) {
     return res.status(404).json({ error: 'Transaction not found' });
   }
 
-  if (transaction.requesterId !== userId && transaction.providerId !== userId) {
-    return res.status(403).json({ error: 'You are not part of this transaction' });
-  }
+  if (transaction.providerId !== userId) {
+  return res.status(403).json({ error: 'Only the provider can mark this swap as completed' });
+}
 
-  if (transaction.status !== 'confirmed') {
-    return res.status(400).json({ error: 'Only confirmed transactions can be marked completed' });
-  }
+if (transaction.status !== 'confirmed') {
+  return res.status(400).json({ error: 'Only confirmed transactions can be marked completed' });
+}
 
   const updated = await prisma.transaction.update({
     where: { id },
