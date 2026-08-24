@@ -49,7 +49,16 @@ model Transaction {
   creditsTransferred Int
   status             String    @default("pending")
   scheduledAt        DateTime?
+  confirmedAt        DateTime?
   createdAt          DateTime  @default(now())
+}
+
+model Message {
+  id            String   @id @default(uuid())
+  transactionId String
+  senderId      String
+  content       String
+  createdAt     DateTime @default(now())
 }
 
 model Review {

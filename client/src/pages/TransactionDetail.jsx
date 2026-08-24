@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Repeat, Star } from 'lucide-react';
 import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import Chat from '../components/Chat';
 
 export default function TransactionDetail() {
   const { id } = useParams();
@@ -14,6 +15,7 @@ export default function TransactionDetail() {
   const [review, setReview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -39,7 +41,7 @@ export default function TransactionDetail() {
 
   const handleConfirm = async () => {
   try {
-    await api.post(`/transactions/${id}/confirm`);
+    await api.post(`/transactions/${id}`, { action: 'confirm' });
     await refreshUser();
     loadData();
   } catch (err) {
@@ -49,7 +51,7 @@ export default function TransactionDetail() {
 
 const handleComplete = async () => {
   try {
-    await api.post(`/transactions/${id}/complete`);
+    await api.post(`/transactions/${id}`, { action: 'complete' });
     loadData();
   } catch (err) {
     setError(err.response?.data?.error || 'Could not complete');
@@ -170,6 +172,16 @@ const handleComplete = async () => {
                 <p className="text-emerald-400 text-sm">✓ Swap completed and credits transferred.</p>
             )}
 
+
+            {(transaction.status === 'confirmed' || transaction.status === 'completed') && (
+              <button
+                onClick={() => setShowChat(!showChat)}
+                className="w-full bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 text-sm font-medium rounded-lg py-2.5 transition"
+              >
+                {showChat ? 'Hide Chat' : '💬 Open Swap Chat'}
+              </button>
+            )}
+
             {transaction.status !== 'pending' && (
               <div className="pt-4 border-t border-slate-800">
                 <h4 className="text-white font-medium text-sm mb-2">Leave a Review</h4>
@@ -213,6 +225,17 @@ const handleComplete = async () => {
             )}
           </div>
         </div>
+        {showChat && (
+          <div className="mt-6">
+            <Chat
+              transactionId={id}
+              providerName={transaction.providerName}
+              requesterName={transaction.requesterName}
+              providerId={transaction.providerId}
+              onClose={() => setShowChat(false)}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
