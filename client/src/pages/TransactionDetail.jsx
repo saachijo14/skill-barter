@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Clock, Star, MessageCircle } from 'lucide-react';
+import { useParams, Link } from 'react-router-dom';
+import { Repeat, Star, Clock, MessageCircle } from 'lucide-react';
 import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
 import Chat from '../components/Chat';
 
 const CANCEL_WINDOW_MS = 15 * 60 * 1000;
@@ -81,7 +80,24 @@ export default function TransactionDetail() {
 
   return (
     <div className="min-h-screen bg-slate-950">
-      <Navbar />
+      <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-xl">
+        <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-400 flex items-center justify-center">
+              <Repeat className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-white font-semibold">SkillSwap</span>
+          </div>
+          <div className="flex items-center gap-6 text-sm">
+            <Link to="/dashboard" className="text-slate-400 hover:text-white transition">Dashboard</Link>
+            <Link to="/explore" className="text-slate-400 hover:text-white transition">Browse Skills</Link>
+            <Link to="/transactions" className="text-cyan-400">My Swaps</Link>
+          </div>
+          <span className="bg-purple-500/20 text-purple-300 text-sm px-3 py-1.5 rounded-full">
+            {user.timeBalance} Credits
+          </span>
+        </div>
+      </nav>
 
       <div className="max-w-5xl mx-auto px-6 py-8">
         {error && (
@@ -106,9 +122,7 @@ export default function TransactionDetail() {
                 >
                   {i < currentStep && !cancelled ? '✓' : i + 1}
                 </div>
-                <div>
-                  <span className={`text-sm block ${i <= currentStep && !cancelled ? 'text-white' : 'text-slate-500'}`}>{label}</span>
-                </div>
+                <span className={`text-sm ${i <= currentStep && !cancelled ? 'text-white' : 'text-slate-500'}`}>{label}</span>
               </div>
               {i < 2 && <div className={`flex-1 h-px mx-3 ${i < currentStep && !cancelled ? 'bg-cyan-500' : 'bg-slate-800'}`} />}
             </div>
