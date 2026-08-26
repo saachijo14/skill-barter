@@ -50,6 +50,7 @@ model Transaction {
   status             String    @default("pending")
   scheduledAt        DateTime?
   confirmedAt        DateTime?
+  completedAt        DateTime?
   createdAt          DateTime  @default(now())
 }
 

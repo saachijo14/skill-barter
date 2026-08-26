@@ -51,45 +51,47 @@ export default async function handler(req, res) {
   }
 
   if (action === 'complete') {
-    if (transaction.providerId !== userId) {
-      return res.status(403).json({ error: 'Only the provider can mark this swap as completed' });
-    }
-    if (transaction.status !== 'confirmed') {
-      return res.status(400).json({ error: 'Only confirmed transactions can be marked completed' });
-    }
-    const updated = await prisma.transaction.update({ where: { id }, data: { status: 'completed' } });
-    return res.status(200).json(updated);
+  if (transaction.providerId !== userId) {
+    return res.status(403).json({ error: 'Only the provider can mark this swap as completed' });
   }
+  if (transaction.status !== 'confirmed') {
+    return res.status(400).json({ error: 'Only confirmed transactions can be marked completed' });
+  }
+  const updated = await prisma.transaction.update({
+    where: { id },
+    data: { status: 'completed', completedAt: new Date() },
+  });
+  return res.status(200).json(updated);
+}
 
     if (action === 'cancel') {
-    if (transaction.requesterId !== userId && transaction.providerId !== userId) {
-      return res.status(403).json({ error: 'You are not part of this transaction' });
-    }
-    if (transaction.status !== 'confirmed') {
-      return res.status(400).json({ error: 'Only confirmed swaps can be cancelled' });
-    }
-    const CANCEL_WINDOW_MS = 15 * 60 * 1000;
-    const confirmedAt = transaction.confirmedAt ? new Date(transaction.confirmedAt).getTime() : 0;
-    if (Date.now() - confirmedAt > CANCEL_WINDOW_MS) {
-      return res.status(400).json({ error: 'Cancel window has expired' });
-    }
-
-    const result = await prisma.$transaction([
-      prisma.user.update({
-        where: { id: transaction.requesterId },
-        data: { timeBalance: { increment: transaction.creditsTransferred } },
-      }),
-      prisma.user.update({
-        where: { id: transaction.providerId },
-        data: { timeBalance: { decrement: transaction.creditsTransferred } },
-      }),
-      prisma.transaction.update({
-        where: { id },
-        data: { status: 'cancelled' },
-      }),
-    ]);
-    return res.status(200).json({ message: 'Swap cancelled', transaction: result[2] });
+  if (transaction.requesterId !== userId && transaction.providerId !== userId) {
+    return res.status(403).json({ error: 'You are not part of this transaction' });
+  }
+  if (transaction.status !== 'completed') {
+    return res.status(400).json({ error: 'Only completed swaps can be cancelled' });
+  }
+  const CANCEL_WINDOW_MS = 15 * 60 * 1000;
+  const completedAt = transaction.completedAt ? new Date(transaction.completedAt).getTime() : 0;
+  if (Date.now() - completedAt > CANCEL_WINDOW_MS) {
+    return res.status(400).json({ error: 'Cancel window has expired' });
   }
 
+  const result = await prisma.$transaction([
+    prisma.user.update({
+      where: { id: transaction.requesterId },
+      data: { timeBalance: { increment: transaction.creditsTransferred } },
+    }),
+    prisma.user.update({
+      where: { id: transaction.providerId },
+      data: { timeBalance: { decrement: transaction.creditsTransferred } },
+    }),
+    prisma.transaction.update({
+      where: { id },
+      data: { status: 'cancelled' },
+    }),
+  ]);
+  return res.status(200).json({ message: 'Swap cancelled and credits refunded', transaction: result[2] });
+}
   return res.status(400).json({ error: 'Invalid action' });
 }

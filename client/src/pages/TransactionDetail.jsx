@@ -73,9 +73,9 @@ export default function TransactionDetail() {
   const currentStep = steps.indexOf(transaction.status);
   const cancelled = transaction.status === 'cancelled';
 
-  const confirmedAtMs = transaction.confirmedAt ? new Date(transaction.confirmedAt).getTime() : null;
-  const cancelMsLeft = confirmedAtMs ? CANCEL_WINDOW_MS - (now - confirmedAtMs) : 0;
-  const canCancel = transaction.status === 'confirmed' && cancelMsLeft > 0;
+  const completedAtMs = transaction.completedAt ? new Date(transaction.completedAt).getTime() : null;
+  const cancelMsLeft = completedAtMs ? CANCEL_WINDOW_MS - (now - completedAtMs) : 0;
+  const canCancel = transaction.status === 'completed' && cancelMsLeft > 0;
   const cancelMinutes = Math.max(0, Math.ceil(cancelMsLeft / 60000));
 
   return (
@@ -111,16 +111,14 @@ export default function TransactionDetail() {
               <div className="flex items-center gap-2">
                 <div
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium border ${
-                    cancelled
-                      ? 'border-slate-700 text-slate-600'
-                      : i < currentStep
-                      ? 'bg-cyan-500 border-cyan-500 text-white'
-                      : i === currentStep
-                      ? 'border-cyan-500 text-cyan-400'
-                      : 'border-slate-700 text-slate-500'
-                  }`}
+                  cancelled
+                  ? 'border-slate-700 text-slate-600'
+                  : i <= currentStep
+                  ? 'bg-cyan-500 border-cyan-500 text-white'
+                  : 'border-slate-700 text-slate-500'
+                   }`}
                 >
-                  {i < currentStep && !cancelled ? '✓' : i + 1}
+                  {i <= currentStep && !cancelled ? '✓' : i + 1}
                 </div>
                 <span className={`text-sm ${i <= currentStep && !cancelled ? 'text-white' : 'text-slate-500'}`}>{label}</span>
               </div>
@@ -211,31 +209,32 @@ export default function TransactionDetail() {
               )}
 
               {transaction.status === 'confirmed' && isProvider && (
-                <button
-                  onClick={() => runAction('complete')}
-                  className="w-full bg-gradient-to-r from-purple-500 to-cyan-400 text-white font-medium rounded-lg py-2.5 transition"
-                >
-                  ✓ Certify Swap Completion
-                </button>
+              <button
+              onClick={() => runAction('complete')}
+              className="w-full bg-gradient-to-r from-purple-500 to-cyan-400 text-white font-medium rounded-lg py-2.5 transition"
+              >
+              ✓ Certify Swap Completion
+              </button>
               )}
               {transaction.status === 'confirmed' && !isProvider && (
                 <p className="text-slate-400 text-sm">Waiting for {transaction.providerName} to certify completion.</p>
               )}
 
+              {transaction.status === 'completed' && (
+               <p className="text-emerald-400 text-sm">✓ Swap completed and credits transferred.</p>
+              )}
+
               {canCancel && (
-                <button
-                  onClick={() => runAction('cancel')}
-                  className="w-full bg-slate-800 hover:bg-red-500/20 hover:text-red-400 text-slate-300 text-sm font-medium rounded-lg py-2.5 transition"
-                >
-                  Cancel Barter Agreement ({cancelMinutes}m left)
-                </button>
+              <button
+                onClick={() => runAction('cancel')}
+                className="w-full bg-slate-800 hover:bg-red-500/20 hover:text-red-400 text-slate-300 text-sm font-medium rounded-lg py-2.5 transition"
+              >
+              Cancel Barter Agreement ({cancelMinutes}m left)
+              </button>
               )}
 
               {cancelled && (
                 <p className="text-red-400 text-sm">This swap was cancelled and credits were refunded.</p>
-              )}
-              {transaction.status === 'completed' && (
-                <p className="text-emerald-400 text-sm">✓ Swap completed and credits transferred.</p>
               )}
 
               {(transaction.status === 'confirmed' || transaction.status === 'completed') && (
