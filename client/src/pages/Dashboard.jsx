@@ -171,7 +171,7 @@ const handleInitiate = async (item) => {
             <div className="rounded-lg h-40 overflow-hidden border border-slate-800 mb-3">
             {userCoords ? (
             <MapContainer center={[userCoords.lat, userCoords.lng]} zoom={11} zoomControl={false} dragging={false} style={{ height: '100%', width: '100%' }}>
-            <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" attribution="" />
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="" />
             <Marker position={[userCoords.lat, userCoords.lng]} />
             {nearby.map((item) => (
             <Marker key={item.id} position={[item.lat, item.lng]} />
