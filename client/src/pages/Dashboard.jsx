@@ -64,7 +64,7 @@ const handleInitiate = async (item) => {
       <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-xl sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-linear-to- from-purple-500 to-cyan-400 flex items-center justify-center">
               <Repeat className="w-4 h-4 text-white" />
             </div>
             <span className="text-white font-semibold">SkillSwap</span>
@@ -124,7 +124,7 @@ const handleInitiate = async (item) => {
             <Link to="/explore" className="text-sm text-slate-300 border border-slate-700 rounded-lg px-3 py-1.5 hover:border-cyan-500/50 transition flex items-center gap-1.5">
               <Radar className="w-4 h-4" /> Find Skills Nearby
             </Link>
-            <Link to="/create-listing" className="text-sm bg-gradient-to-r from-purple-500 to-cyan-400 text-white rounded-lg px-3 py-1.5 flex items-center gap-1.5">
+            <Link to="/create-listing" className="text-sm bg-linear-to- from-purple-500 to-cyan-400 text-white rounded-lg px-3 py-1.5 flex items-center gap-1.5">
               <Plus className="w-4 h-4" /> Post a Listing
             </Link>
           </div>

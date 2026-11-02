@@ -32,6 +32,7 @@ export default function Explore() {
 
   useEffect(() => {
     if (!coords) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     api
       .get('/listings/search', { params: { lat: coords.lat, lng: coords.lng, radius } })
@@ -62,7 +63,7 @@ const handleInitiate = async (item) => {
       <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-linear-to- from-purple-500 to-cyan-400 flex items-center justify-center">
               <Repeat className="w-4 h-4 text-white" />
             </div>
             <span className="text-white font-semibold">SkillSwap</span>
@@ -108,7 +109,7 @@ const handleInitiate = async (item) => {
         </div>
         <Link
           to="/create-listing"
-          className="bg-gradient-to-r from-purple-500 to-cyan-400 text-white text-sm rounded-lg px-4 py-2 flex items-center gap-1.5 whitespace-nowrap"
+          className="bg-linear-to- from-purple-500 to-cyan-400 text-white text-sm rounded-lg px-4 py-2 flex items-center gap-1.5 whitespace-nowrap"
         >
           <Plus className="w-4 h-4" /> Post Listing
         </Link>
@@ -116,7 +117,7 @@ const handleInitiate = async (item) => {
 
       {/* Map + list */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-6 pb-6 grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 rounded-xl overflow-hidden border border-slate-800 min-h-[500px]">
+        <div className="md:col-span-2 rounded-xl overflow-hidden border border-slate-800 min-h-125">
           {coords ? (
             <MapContainer center={[coords.lat, coords.lng]} zoom={12} style={{ height: '100%', width: '100%' }}>
               <TileLayer
@@ -147,7 +148,7 @@ const handleInitiate = async (item) => {
         </div>
 
         {/* Sidebar list */}
-        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+        <div className="space-y-3 max-h-125 overflow-y-auto pr-1">
           <h3 className="text-white font-medium text-sm mb-2">Radar Matches Nearby ({filtered.length})</h3>
           {filtered.map((item) => (
             <div key={item.id} className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
